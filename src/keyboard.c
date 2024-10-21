@@ -48,7 +48,10 @@ void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
   if(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
-  vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
+  int hasAlt = (mod & VTERM_MOD_ALT) != 0;
+  char str[7] = ESC_S;
+  int seqlen = fill_utf8(c, &str[hasAlt]);
+  vterm_push_output_bytes(vt, str, seqlen + hasAlt);
 }
 
 typedef struct {
